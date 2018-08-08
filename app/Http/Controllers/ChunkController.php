@@ -9,21 +9,28 @@ class ChunkController extends Controller
 {
     public function getIndex()
     {
-        // ini_set('memory_limit', '-1');
-        Sticker::whereNotNull('title')->whereNull('title_th')->whereNull('title_en')->chunk(500, function ($stickers) {
+        // set_time_limit(0);
+        Sticker::select('id','title')->where('status','approve')->whereNotNull('title')->whereNull('updated_at')->orderBy('id','asc')->chunk(50, function ($stickers) {
 
             foreach ($stickers as $row) {
-                //echo var_dump(json_decode($row->title));
-                @$title = json_decode($row->title);
-                // echo $title->{'th'};
-
+                // echo var_dump(json_decode($row->title));
+                @$title = @json_decode($row->title);
+                // var_dump($title);
+                
                 $row->update([
-                    'title_th' => @$title->{'th'},
-                    'title_en' => @$title->{'en'}
+                    'title_en' => @$title ? @$title->{'en'} : '',
+                    'title_th' => @$title ? @$title->{'th'} ? @$title->{'th'} : @$title->{'en'} : ''
                 ]);
-            }
 
-            echo "success<br>";
+                // echo "success<br>";
+
+                // echo 'ไอดี = '.$row->id.' <br>';
+                // echo $row->title.' <br>';
+                // echo 'ชื่อไทย = '.@$title->{'th'}.'<br>';
+                // echo 'ชื่ออังกิด = '.@$title->{'en'}.'<br>---------------------------<br>';
+                // echo $row->id.', ';
+            }
+            // echo $row->id.', ';
             // exit();
         });
     }
